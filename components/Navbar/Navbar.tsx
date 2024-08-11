@@ -1,14 +1,25 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { Menu, X, User } from "lucide-react";
-import Image from "next/image";
+import { Menu, X, User, LogIn } from "lucide-react";
+import { useAppSelector } from "@/app/GlobalRedux/hooks";
+import { RootState } from "@/app/GlobalRedux/rootReducer";
+import { useLogoutUser } from "@/lib/actions/log-out";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // Track user menu state
+  const { logoutUser } = useLogoutUser(); // Use the logout hook
+  const currentUser = useAppSelector(
+    (state: RootState) => state.user.currentUser
+  );
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const toggleUserMenu = () => {
+    setIsUserMenuOpen(!isUserMenuOpen);
   };
 
   return (
@@ -24,10 +35,26 @@ const Navbar: React.FC = () => {
             <NavItem href="/about">About</NavItem>
             <NavItem href="/contact">Contact</NavItem>
           </div>
-          <UserLogo />
+          {currentUser ? (
+            <UserLogo
+              isOpen={isUserMenuOpen}
+              toggleUserMenu={toggleUserMenu}
+              onLogout={logoutUser} // Pass logout function here
+            />
+          ) : (
+            <LoginButton />
+          )}
         </div>
         <div className="flex items-center md:hidden">
-          <UserLogo />
+          {currentUser ? (
+            <UserLogo
+              isOpen={isUserMenuOpen}
+              toggleUserMenu={toggleUserMenu}
+              onLogout={logoutUser} // Pass logout function here
+            />
+          ) : (
+            <LoginButton />
+          )}
           <button
             className="ml-2 text-white"
             onClick={toggleMenu}
@@ -73,32 +100,51 @@ const NavItem: React.FC<{
   </Link>
 );
 
-const UserLogo: React.FC = () => (
-  <div className="relative group">
-    <button className="flex items-center text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+const UserLogo: React.FC<{
+  isOpen: boolean;
+  toggleUserMenu: () => void;
+  onLogout?: () => void;
+}> = ({ isOpen, toggleUserMenu, onLogout }) => (
+  <div className="relative">
+    <button
+      onClick={toggleUserMenu}
+      className="flex items-center text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+    >
       <User size={20} />
     </button>
-    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
-      <Link
-        href="/profile"
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-      >
-        Profile
-      </Link>
-      <Link
-        href="/settings"
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-      >
-        Settings
-      </Link>
-      <Link
-        href="/logout"
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-      >
-        Logout
-      </Link>
-    </div>
+    {isOpen && (
+      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+        <Link
+          href="/profile"
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+        >
+          Profile
+        </Link>
+        <Link
+          href="/settings"
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+        >
+          Settings
+        </Link>
+        <button
+          onClick={() => {
+            if (onLogout) onLogout(); // Call the logout function
+          }}
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+        >
+          Logout
+        </button>
+      </div>
+    )}
   </div>
+);
+
+const LoginButton: React.FC = () => (
+  <Link href="/login">
+    <button className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+      <span className="ml-2">Login</span>
+    </button>
+  </Link>
 );
 
 export default Navbar;
