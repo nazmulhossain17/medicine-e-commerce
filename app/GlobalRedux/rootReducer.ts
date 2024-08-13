@@ -1,10 +1,14 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import userReducer from "./features/userSlice/userSlice";
+import { api } from "./features/api/apiSlice";
+import productReducer from "./features/products/productSlice";
+import cartReducer from "./features/cart/cartSlice";
 
 const rootReducer = combineReducers({
   user: userReducer,
-  // Add other reducers here
+  product: productReducer,
+  cart: cartReducer,
+  [api.reducerPath]: api.reducer,
 });
 
-export type RootState = ReturnType<typeof rootReducer>;
 export default rootReducer;

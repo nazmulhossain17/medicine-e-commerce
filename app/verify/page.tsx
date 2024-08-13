@@ -19,7 +19,7 @@ const OTPVerification: React.FC = () => {
   const sendOTP = async () => {
     try {
       const res = await fetch(
-        "http://localhost:5000/api/v1/send-verification",
+        "https://medicine-e-commerce-server.vercel.app/api/v1/send-verification",
         {
           method: "POST",
           headers: {
@@ -66,13 +66,16 @@ const OTPVerification: React.FC = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/api/v1/verify-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, code: otp.join("") }),
-      });
+      const res = await fetch(
+        "https://medicine-e-commerce-server.vercel.app/api/v1/verify-user",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, code: otp.join("") }),
+        }
+      );
 
       if (!res.ok) {
         console.error(`Error verifying OTP. Status: ${res.status}`);

@@ -36,6 +36,22 @@ export const useLoginUser = () => {
       }
 
       const userInfo = await res.json();
+      if (!userInfo.isVerified) {
+        // Send OTP if the user is not verified
+        await fetch(
+          "https://medicine-e-commerce-server.vercel.app/api/v1/send-verification",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: userInfo.email }),
+          }
+        );
+
+        toast.info("Account not verified. Redirecting to OTP verification.");
+        return { isVerified: false, email: userInfo.email };
+      }
       dispatch(signInSuccess(userInfo));
       dispatch(userAdded(userInfo));
       toast.success("Logged in successfully");

@@ -1,3 +1,4 @@
+import FeaturedSection from "@/components/FeaturedSection/FeaturedSection";
 import HeroSection from "@/components/Hero/Hero";
 import Image from "next/image";
 
@@ -44,26 +45,11 @@ export default function Home() {
             />
           </div>
         </div>
-        {/* <div className="mt-8">
-          <p className="text-sm text-gray-400 mb-2">Partners and backers:</p>
-          <div className="flex space-x-6">
-            <Image
-              src="/greenpeace-logo.png"
-              alt="Greenpeace"
-              width={100}
-              height={40}
-            />
-            <Image
-              src="/un-logo.png"
-              alt="United Nations"
-              width={100}
-              height={40}
-            />
-            <Image src="/wwf-logo.png" alt="WWF" width={100} height={40} />
-            <Image src="/oxfam-logo.png" alt="Oxfam" width={100} height={40} />
-          </div>
-        </div> */}
       </div>
+      <div className="text-center my-8">
+        <h1 className="text-3xl mb-2">Our Products</h1>
+      </div>
+      <FeaturedSection />
     </main>
   );
 }

@@ -1,18 +1,17 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { Menu, X, User, LogIn } from "lucide-react";
+import { Menu, X, User, LogIn, ShoppingCart } from "lucide-react";
 import { useAppSelector } from "@/app/GlobalRedux/hooks";
-import { RootState } from "@/app/GlobalRedux/rootReducer";
 import { useLogoutUser } from "@/lib/actions/log-out";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // Track user menu state
   const { logoutUser } = useLogoutUser(); // Use the logout hook
-  const currentUser = useAppSelector(
-    (state: RootState) => state.user.currentUser
-  );
+  const currentUser = useAppSelector((state: any) => state.user.currentUser);
+  const cartItems = useAppSelector((state: any) => state.cart.products);
+  const cartItemCount = cartItems.length;
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -36,22 +35,31 @@ const Navbar: React.FC = () => {
             <NavItem href="/contact">Contact</NavItem>
           </div>
           {currentUser ? (
-            <UserLogo
-              isOpen={isUserMenuOpen}
-              toggleUserMenu={toggleUserMenu}
-              onLogout={logoutUser} // Pass logout function here
-            />
+            <>
+              <UserLogo
+                isOpen={isUserMenuOpen}
+                toggleUserMenu={toggleUserMenu}
+                onLogout={logoutUser} // Pass logout function here
+              />
+              <CartButton itemCount={cartItemCount} />
+            </>
           ) : (
-            <LoginButton />
+            <>
+              <LoginButton />
+              <CartButton itemCount={cartItemCount} />
+            </>
           )}
         </div>
         <div className="flex items-center md:hidden">
           {currentUser ? (
-            <UserLogo
-              isOpen={isUserMenuOpen}
-              toggleUserMenu={toggleUserMenu}
-              onLogout={logoutUser} // Pass logout function here
-            />
+            <>
+              <UserLogo
+                isOpen={isUserMenuOpen}
+                toggleUserMenu={toggleUserMenu}
+                onLogout={logoutUser} // Pass logout function here
+              />
+              <CartButton itemCount={cartItemCount} />
+            </>
           ) : (
             <LoginButton />
           )}
@@ -80,6 +88,21 @@ const Navbar: React.FC = () => {
               Contact
             </NavItem>
           </div>
+          {currentUser ? (
+            <>
+              <UserLogo
+                isOpen={isUserMenuOpen}
+                toggleUserMenu={toggleUserMenu}
+                onLogout={logoutUser} // Pass logout function here
+              />
+              <CartButton itemCount={cartItemCount} />
+            </>
+          ) : (
+            <>
+              <LoginButton />
+              <CartButton itemCount={cartItemCount} />
+            </>
+          )}
         </div>
       )}
     </nav>
@@ -144,6 +167,19 @@ const LoginButton: React.FC = () => (
     <button className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
       <span className="ml-2">Login</span>
     </button>
+  </Link>
+);
+
+const CartButton: React.FC<{ itemCount: number }> = ({ itemCount }) => (
+  <Link href="/cart">
+    <div className="relative">
+      <ShoppingCart className="m-2" size={24} />
+      {itemCount > 0 && (
+        <span className="absolute top-0 right-0 block w-4 h-4 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+          {itemCount}
+        </span>
+      )}
+    </div>
   </Link>
 );
 

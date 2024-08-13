@@ -17,10 +17,12 @@ export default function Login() {
     setError("");
 
     try {
-      const userInfo = await loginUser({ email, password }); // Use loginUser from the hook
-      if (userInfo) {
+      const response = await loginUser({ email, password }); // Use loginUser from the hook
+      if (response.isVerified) {
         // Save user info to state or local storage if needed
         router.push("/");
+      } else {
+        router.push(`/verify?email=${response.email}`);
       }
     } catch (err) {
       setError("Invalid credentials");
