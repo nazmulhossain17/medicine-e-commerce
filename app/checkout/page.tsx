@@ -1,95 +1,156 @@
 "use client";
 import { useState } from "react";
 import { useAppSelector } from "../GlobalRedux/hooks";
+import Image from "next/image";
+import Modal from "@/components/Modal/Modal";
+
+interface Product {
+  _id: string;
+  name: string;
+  photos: string[];
+  price: number;
+  quantity: number;
+}
 
 const Checkout = () => {
   const [scheduled, setScheduled] = useState(false);
-  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { products } = useAppSelector((state) => state.cart);
-  const subtotal = products.reduce((acc, product) => {
+  const currentUser = useAppSelector((state: any) => state.user.currentUser);
+  const { products } = useAppSelector((state: any) => state.cart);
+
+  const subtotal = products.reduce((acc: number, product: Product) => {
     return acc + product.price * product.quantity;
   }, 0);
 
-  // Define the delivery cost
   const deliveryCost = 4.5;
-
-  // Calculate the total cost
   const total = subtotal + deliveryCost;
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!paymentMethod) {
+      setError("Please select a payment method.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/v4/create-shipping",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: currentUser?._id,
+            division: city,
+            district: city,
+            subDistrict: city,
+            address,
+            name: currentUser?.name,
+            phone,
+            paymentMethod,
+            products: products.map((product: Product) => product.name),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to create shipping address");
+      }
+
+      const data = await response.json();
+      setSuccess("Order placed successfully!");
+      setIsModalOpen(true); // Open the modal on success
+    } catch (err: any) {
+      setError(err.message || "Failed to create shipping address");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const closeModal = () => setIsModalOpen(false);
+
   return (
-    <div className="flex flex-col items-center gap-5 p-20 sm:flex-row ">
+    <div className="flex flex-col items-center gap-5 p-20 sm:flex-row">
       <div className="w-full sm:w-1/2 md:max-w-3xl">
         <h1 className="mb-2">Delivery Information</h1>
-        <div className="h-[60vh] border border-gray-300 rounded-md p-10 overflow-auto">
+        <form
+          onSubmit={handleSubmit}
+          className="h-[60vh] border border-gray-300 rounded-md p-10 overflow-auto"
+        >
           <div className="flex gap-5">
             <div className="w-full space-y-5">
               <div>
                 <label htmlFor="userName">
                   Name: <b>{currentUser?.name}</b>
                 </label>
-                &nbsp;
-                <input type="text" id="userName" className="mt-2" />
+                <input
+                  type="text"
+                  id="userName"
+                  className="mt-2"
+                  defaultValue={currentUser?.name}
+                  readOnly
+                />
               </div>
               <div>
                 <label htmlFor="userEmail">
                   Email: <b>{currentUser?.email}</b>
                 </label>
-                <input type="text" id="userEmail" className="mt-2" />
+                <input
+                  type="text"
+                  id="userEmail"
+                  className="mt-2"
+                  defaultValue={currentUser?.email}
+                  readOnly
+                />
               </div>
             </div>
             <div className="w-full space-y-5">
               <div>
                 <label htmlFor="phone">Phone</label>
-                <input type="text" id="phone" className="mt-2" />
+                <input
+                  type="text"
+                  id="phone"
+                  className="mt-2"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
               </div>
               <div>
                 <label htmlFor="city">City</label>
-                <input type="text" id="city" className="mt-2" />
+                <input
+                  type="text"
+                  id="city"
+                  className="mt-2"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                />
               </div>
             </div>
           </div>
           <div className="mt-5">
-            <label htmlFor="address">
-              Address: <b>{currentUser?.address}</b>
-            </label>
+            <label htmlFor="address">Address:</label>
             <textarea
               id="address"
               className="mt-2 w-full rounded-md border p-2"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-2 mt-5">
-            <label className="text-lg">Scheduled Delivery</label>
-            <input
-              type="checkbox"
-              checked={scheduled}
-              onChange={() => setScheduled(!scheduled)}
-              className="ml-2"
-            />
-          </div>
-          <div className="flex gap-5 mt-5">
-            <div className="w-full">
-              <label htmlFor="note">Note</label>
-              <input
-                disabled={!scheduled}
-                type="text"
-                id="note"
-                className="mt-3 w-full rounded-md border p-2"
-              />
-            </div>
-            <div className="w-full flex flex-col mt-2">
-              <label className="mb-3" htmlFor="date">
-                Date
-              </label>
-              {/* Assuming you want to use a date picker */}
-              <input
-                type="date"
-                id="date"
-                disabled={!scheduled}
-                className="mt-3 w-full rounded-md border p-2"
-              />
-            </div>
-          </div>
+
           <div className="mt-3">
             <label className="text-lg">Payment method</label>
             <div className="flex gap-5 mt-5">
@@ -98,7 +159,9 @@ const Checkout = () => {
                   type="radio"
                   id="r1"
                   name="paymentMethod"
-                  value="online"
+                  value="Online Payment"
+                  checked={paymentMethod === "Online Payment"}
+                  onChange={() => setPaymentMethod("Online Payment")}
                   className="border border-gray-400"
                 />
                 <label htmlFor="r1">Online payment</label>
@@ -108,29 +171,46 @@ const Checkout = () => {
                   type="radio"
                   id="r2"
                   name="paymentMethod"
-                  value="cash"
+                  value="Cash on Delivery"
+                  checked={paymentMethod === "Cash on Delivery"}
+                  onChange={() => setPaymentMethod("Cash on Delivery")}
                   className="border border-gray-400"
                 />
                 <label htmlFor="r2">Cash on delivery</label>
               </div>
             </div>
           </div>
-        </div>
+
+          {error && <div className="text-red-600 mt-4">{error}</div>}
+          {success && <div className="text-green-600 mt-4">{success}</div>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`mt-4 inline-flex w-full items-center justify-center rounded bg-lime-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-lime-500 sm:text-lg ${
+              loading ? "bg-gray-400" : ""
+            }`}
+          >
+            {loading ? "Placing Order..." : "Place Order"}
+          </button>
+        </form>
       </div>
       <div className="w-full sm:w-1/2 md:max-w-lg">
         <h1 className="mb-2 text-center sm:text-left">Order Summary</h1>
         <div className="border border-gray-300 rounded-md h-[60vh] p-10 flex flex-col">
           <div className="flex-grow mb-2 space-y-2 overflow-auto">
-            {products.map((product) => (
+            {products.map((product: Product) => (
               <div
                 key={product._id}
                 className="flex justify-between items-center bg-gray-100 p-1 rounded-lg"
               >
                 <div className="flex items-center">
-                  <img
+                  <Image
                     src={product.photos[0] || "/fallback-image.jpg"} // Fallback if image is not available
                     className="h-[82px] rounded-md mr-2"
                     alt={product.name}
+                    width={82}
+                    height={82}
                   />
                   <div>
                     <h1 className="text-lg mb-2">{product.name}</h1>
@@ -156,15 +236,16 @@ const Checkout = () => {
               <p>Total</p>
               <p>{total.toFixed(2)}$</p>
             </div>
-            <button
-              type="submit"
-              className="mt-4 inline-flex w-full items-center justify-center rounded bg-lime-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-lime-500 sm:text-lg"
-            >
-              Place Order
-            </button>
           </div>
         </div>
       </div>
+
+      {/* Modal Component */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        message={success || ""}
+      />
     </div>
   );
 };

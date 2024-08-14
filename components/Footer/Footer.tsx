@@ -7,16 +7,9 @@ const Footer = () => {
       <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
-            <a href="https://flowbite.com/" className="flex items-center">
-              <Image
-                src="https://flowbite.com/docs/images/logo.svg"
-                className="h-8 me-3"
-                alt="FlowBite Logo"
-                width={32}
-                height={32}
-              />
+            <a href="#" className="flex items-center">
               <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-                Flowbite
+                Medicine Store
               </span>
             </a>
           </div>
@@ -28,7 +21,7 @@ const Footer = () => {
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
                 <li className="mb-4">
                   <a href="https://flowbite.com/" className="hover:underline">
-                    Flowbite
+                    Medicine Store
                   </a>
                 </li>
                 <li>
@@ -88,7 +81,7 @@ const Footer = () => {
           <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
             © 2024{" "}
             <a href="https://flowbite.com/" className="hover:underline">
-              Flowbite™
+              Medicine Store™
             </a>
             . All Rights Reserved.
           </span>

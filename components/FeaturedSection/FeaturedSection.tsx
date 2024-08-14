@@ -3,12 +3,17 @@ import React from "react";
 import { useGetProductsQuery } from "@/app/GlobalRedux/features/api/apiSlice";
 import Link from "next/link";
 import FeaturesDemo from "./FeaturesDemo";
+import Loader from "../Loader/Loader";
 
 const FeaturedSection = () => {
   const { data, isLoading } = useGetProductsQuery(undefined);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center">
+        <Loader />
+      </div>
+    );
   }
 
   if (!data || !Array.isArray(data.products)) {
@@ -25,7 +30,7 @@ const FeaturedSection = () => {
           <h2 className="text-3xl mb-2">Featured Products</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 space-x-1">
-          {limitedData.map((product) => (
+          {limitedData.map((product: any) => (
             <FeaturesDemo product={product} key={product._id} />
           ))}
         </div>

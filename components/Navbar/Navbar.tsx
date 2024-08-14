@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu, X, User, LogIn, ShoppingCart } from "lucide-react";
 import { useAppSelector } from "@/app/GlobalRedux/hooks";
 import { useLogoutUser } from "@/lib/actions/log-out";
+import { useRouter } from "next/navigation";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -127,40 +128,55 @@ const UserLogo: React.FC<{
   isOpen: boolean;
   toggleUserMenu: () => void;
   onLogout?: () => void;
-}> = ({ isOpen, toggleUserMenu, onLogout }) => (
-  <div className="relative">
-    <button
-      onClick={toggleUserMenu}
-      className="flex items-center text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-    >
-      <User size={20} />
-    </button>
-    {isOpen && (
-      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-        <Link
-          href="/profile"
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-        >
-          Profile
-        </Link>
-        <Link
-          href="/settings"
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-        >
-          Settings
-        </Link>
-        <button
-          onClick={() => {
-            if (onLogout) onLogout(); // Call the logout function
-          }}
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-        >
-          Logout
-        </button>
-      </div>
-    )}
-  </div>
-);
+}> = ({ isOpen, toggleUserMenu, onLogout }) => {
+  const router = useRouter(); // Initialize the router
+
+  const handleLogout = async () => {
+    if (onLogout) {
+      await onLogout(); // Call the logout function
+      router.push("/"); // Redirect to home page
+    }
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={toggleUserMenu}
+        className="flex items-center text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+      >
+        <User size={20} />
+      </button>
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+          <Link
+            href="/profile"
+            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            Profile
+          </Link>
+          <Link
+            href="/create-product"
+            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            Sell Product
+          </Link>
+          <Link
+            href="/settings"
+            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            Settings
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const LoginButton: React.FC = () => (
   <Link href="/login">

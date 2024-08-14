@@ -48,7 +48,11 @@ const PageDetails = () => {
   };
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <div className="flex justify-center">
+        <Loader />
+      </div>
+    );
   }
 
   if (error) {

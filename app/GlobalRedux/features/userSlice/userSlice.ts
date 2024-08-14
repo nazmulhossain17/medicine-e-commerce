@@ -1,6 +1,20 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = {
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  photo: string;
+}
+
+interface UserState {
+  currentUser: User | null;
+  isLoading: boolean;
+  isError: boolean;
+  error: string | null;
+}
+
+const initialState: UserState = {
   currentUser: null,
   isLoading: false,
   isError: false,
@@ -14,13 +28,13 @@ const userSlice = createSlice({
     signInStart: (state) => {
       state.isLoading = true;
     },
-    signInSuccess: (state, action) => {
+    signInSuccess: (state, action: PayloadAction<User>) => {
       state.currentUser = action.payload;
       state.isLoading = false;
       state.error = null;
       state.isError = false;
     },
-    signInFailure: (state, action) => {
+    signInFailure: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
       state.isLoading = false;
       state.isError = true;
@@ -34,7 +48,7 @@ const userSlice = createSlice({
       state.error = null;
       state.isError = false;
     },
-    signOutUserFailure: (state, action) => {
+    signOutUserFailure: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
       state.isLoading = false;
       state.isError = true;
@@ -48,12 +62,17 @@ const userSlice = createSlice({
       state.error = null;
       state.isError = false;
     },
-    deleteUserFailure: (state, action) => {
+    deleteUserFailure: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
       state.isLoading = false;
       state.isError = true;
     },
-    userAdded: (state, action) => {
+    updateUser: (state, action: PayloadAction<User>) => {
+      if (state.currentUser && state.currentUser.id === action.payload.id) {
+        state.currentUser = { ...state.currentUser, ...action.payload };
+      }
+    },
+    userAdded: (state, action: PayloadAction<User>) => {
       state.currentUser = action.payload;
     },
     removeUser: (state) => {
@@ -72,6 +91,7 @@ export const {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
+  updateUser,
   userAdded,
   removeUser,
 } = userSlice.actions;
