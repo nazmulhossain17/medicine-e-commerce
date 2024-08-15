@@ -1,4 +1,3 @@
-import { RootState } from "@/app/GlobalRedux/rootReducer";
 import Image from "next/image";
 
 const HeroSection = () => {

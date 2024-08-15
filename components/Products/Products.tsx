@@ -1,5 +1,6 @@
 import { addToCart } from "@/app/GlobalRedux/features/cart/cartSlice";
 import { useAppDispatch } from "@/app/GlobalRedux/hooks";
+import Image from "next/image";
 import Link from "next/link";
 import { toast } from "react-toastify";
 
@@ -31,7 +32,12 @@ const Products = ({ product }: { product: Product }) => {
             href={`/product/product-details/${product._id}`}
             className="w-full hover:text-purple-700"
           >
-            <img src={product?.photos[0]} alt="product" />
+            <Image
+              width={300}
+              height={300}
+              src={product?.photos[0]}
+              alt="product"
+            />
             <h1 className="text-xl font-semibold">{product?.name}</h1>
           </Link>
           <p>{product?.slug}</p>

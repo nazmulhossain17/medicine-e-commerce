@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // Track user menu state
-  const { logoutUser } = useLogoutUser(); // Use the logout hook
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const { logoutUser } = useLogoutUser();
   const currentUser = useAppSelector((state: any) => state.user.currentUser);
   const cartItems = useAppSelector((state: any) => state.cart.products);
   const cartItemCount = cartItems.length;
@@ -40,7 +40,8 @@ const Navbar: React.FC = () => {
               <UserLogo
                 isOpen={isUserMenuOpen}
                 toggleUserMenu={toggleUserMenu}
-                onLogout={logoutUser} // Pass logout function here
+                onLogout={logoutUser}
+                currentUser={currentUser} // Pass currentUser as a prop
               />
               <CartButton itemCount={cartItemCount} />
             </>
@@ -57,7 +58,8 @@ const Navbar: React.FC = () => {
               <UserLogo
                 isOpen={isUserMenuOpen}
                 toggleUserMenu={toggleUserMenu}
-                onLogout={logoutUser} // Pass logout function here
+                onLogout={logoutUser}
+                currentUser={currentUser} // Pass currentUser as a prop
               />
               <CartButton itemCount={cartItemCount} />
             </>
@@ -94,7 +96,8 @@ const Navbar: React.FC = () => {
               <UserLogo
                 isOpen={isUserMenuOpen}
                 toggleUserMenu={toggleUserMenu}
-                onLogout={logoutUser} // Pass logout function here
+                onLogout={logoutUser}
+                currentUser={currentUser} // Pass currentUser as a prop
               />
               <CartButton itemCount={cartItemCount} />
             </>
@@ -128,13 +131,14 @@ const UserLogo: React.FC<{
   isOpen: boolean;
   toggleUserMenu: () => void;
   onLogout?: () => void;
-}> = ({ isOpen, toggleUserMenu, onLogout }) => {
-  const router = useRouter(); // Initialize the router
+  currentUser: any; // Add currentUser as a prop
+}> = ({ isOpen, toggleUserMenu, onLogout, currentUser }) => {
+  const router = useRouter();
 
   const handleLogout = async () => {
     if (onLogout) {
-      await onLogout(); // Call the logout function
-      router.push("/"); // Redirect to home page
+      await onLogout();
+      router.push("/");
     }
   };
 
@@ -154,6 +158,14 @@ const UserLogo: React.FC<{
           >
             Profile
           </Link>
+          {currentUser.role === "admin" || currentUser.role === "superAdmin" ? (
+            <Link
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              href="/dashboard"
+            >
+              Dashboard
+            </Link>
+          ) : null}
           <Link
             href="/create-product"
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

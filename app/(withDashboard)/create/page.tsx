@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
-import { useGetCategoriesQuery } from "../GlobalRedux/features/api/apiSlice";
+import { useGetCategoriesQuery } from "@/app/GlobalRedux/features/api/apiSlice";
 import Loader from "@/components/Loader/Loader";
+import { useState } from "react";
 
-const CreateProduct = () => {
+const Create = () => {
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -43,12 +43,15 @@ const CreateProduct = () => {
         ...prevData,
         [name]: (e.target as HTMLInputElement).checked,
       }));
-    } else if (e.target instanceof HTMLSelectElement && e.target.multiple) {
+    } else if (
+      e.target instanceof HTMLSelectElement &&
+      (e.target as HTMLSelectElement).multiple
+    ) {
       setFormData((prevData) => ({
         ...prevData,
         [name]: Array.from(
           (e.target as HTMLSelectElement).selectedOptions,
-          (option) => option.value
+          (option: any) => option.value
         ),
       }));
     } else {
@@ -333,4 +336,4 @@ const CreateProduct = () => {
   );
 };
 
-export default CreateProduct;
+export default Create;

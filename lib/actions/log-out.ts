@@ -27,7 +27,7 @@ export const useLogoutUser = () => {
     } catch (error) {
       toast.error("An error occurred during logout");
       console.error(error);
-      dispatch(deleteUserFailure(error));
+      dispatch(deleteUserFailure(error as string));
     }
   };
 

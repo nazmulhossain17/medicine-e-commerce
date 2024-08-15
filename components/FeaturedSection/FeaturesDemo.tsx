@@ -1,14 +1,35 @@
+"use client";
 import { addToCart } from "@/app/GlobalRedux/features/cart/cartSlice";
 import { useAppDispatch } from "@/app/GlobalRedux/hooks";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "react-toastify";
 
-const FeaturesDemo = ({ product }) => {
+// Adjust IProduct interface to match the Product type
+interface IProduct {
+  _id: string; // Include _id
+  name: string;
+  slug: string;
+  photos: string[];
+  description: string;
+  metaKey: string;
+  price: number;
+  discount: number;
+  stockStatus: boolean;
+  status: boolean;
+  quantity?: number; // Optionally include quantity
+}
+
+const FeaturesDemo = ({ product }: { product: IProduct }) => {
   const dispatch = useAppDispatch();
 
   const handleAddProduct = () => {
-    dispatch(addToCart(product));
+    const productWithQuantity = {
+      ...product,
+      quantity: product.quantity || 1, // Ensure quantity is set
+    };
+
+    dispatch(addToCart(productWithQuantity));
     toast.success("Product Added");
   };
 
@@ -31,7 +52,7 @@ const FeaturesDemo = ({ product }) => {
           <p>{product?.slug || "N/A"}</p>
           <p className="text-2xl">Price: ${product?.price}</p>
           <button
-            onClick={() => handleAddProduct(product)}
+            onClick={handleAddProduct}
             className="px-6 py-2 uppercase transition duration-200 ease-in border-2 border-gray-900 rounded-full hover:bg-gray-800 hover:text-white focus:outline-none"
           >
             Add to cart
