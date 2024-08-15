@@ -46,7 +46,7 @@ const Checkout = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/v4/create-shipping",
+        "https://medicine-e-commerce-server.vercel.app/api/v4/create-shipping",
         {
           method: "POST",
           headers: {
